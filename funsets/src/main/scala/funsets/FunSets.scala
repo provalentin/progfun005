@@ -26,24 +26,24 @@ object FunSets {
    * Returns the union of the two given sets,
    * the sets of all elements that are in either `s` or `t`.
    */
-  def union(s: Set, t: Set): Set = x => s(x) || t(x)
+  def union(s: Set, t: Set): Set = x => contains(s,x) || contains(t,x)
 
   /**
    * Returns the intersection of the two given sets,
    * the set of all elements that are both in `s` and `t`.
    */
-  def intersect(s: Set, t: Set): Set = x=> s(x) && t(x)
+  def intersect(s: Set, t: Set): Set = x=> contains(s,x) && contains(t,x)
 
   /**
    * Returns the difference of the two given sets,
    * the set of all elements of `s` that are not in `t`.
    */
-  def diff(s: Set, t: Set): Set = x => s(x) && !t(x)
+  def diff(s: Set, t: Set): Set = x => contains(s,x) && !contains(t,x)
 
   /**
    * Returns the subset of `s` for which `p` holds.
    */
-  def filter(s: Set, p: Int => Boolean): Set = x => s(x) && p(x)
+  def filter(s: Set, p: Int => Boolean): Set = x => contains(s,x) && p(x)
 
   /**
    * The bounds for `forall` and `exists` are +/- 1000.
@@ -55,8 +55,17 @@ object FunSets {
    */
   def forall(s: Set, p: Int => Boolean): Boolean = {
     def iter(a: Int): Boolean = {
-      if (a>=bound) true
-      else if (!p(a)) false
+      if (a>bound) true
+      else if (contains(s,a) && !p(a)) false
+      else iter(a+1)
+    }
+    iter(-bound)
+  }
+  
+  def printSet2(s: Set) : Boolean = {
+    def iter(a: Int): Boolean = {
+      if (contains(s,a)) println(a + " ")
+      if (a>bound) true
       else iter(a+1)
     }
     iter(-bound)
@@ -71,7 +80,7 @@ object FunSets {
   /**
    * Returns a set transformed by applying `f` to each element of `s`.
    */
-  def map(s: Set, f: Int => Int): Set = x => s(f(x))
+  def map(s: Set, f: Int => Int): Set = x=> exists(s, y=>f(y)==x)
 
   /**
    * Displays the contents of a set
